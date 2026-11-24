@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portfolio - ด.ญ. อารยา สุภาษี (ฟางข้าว)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt & Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'Sarabun', 'sans-serif'],
+                        body: ['Sarabun', 'Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#7c3aed',
+                            purpleLight: '#8b5cf6',
+                            dark: '#111827',
+                            bg: '#f8fafc',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Pastel Gradient Banner */
+        .hero-banner-gradient {
+            background: linear-gradient(115deg, #c7d2fe 0%, #ddd6fe 45%, #fbcfe8 100%);
+        }
+
+        /* Editable visual cues when Edit Mode is ON */
+        .edit-mode-active [data-editable="true"] {
+            outline: 1.5px dashed #8b5cf6;
+            outline-offset: 3px;
+            border-radius: 6px;
+            background-color: rgba(139, 92, 246, 0.04);
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        .edit-mode-active [data-editable="true"]:hover,
+        .edit-mode-active [data-editable="true"]:focus {
+            outline: 2px solid #7c3aed;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Print styles for clean PDF export */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+            }
+            .shadow-sm, .shadow-md, .shadow-lg {
+                box-shadow: none !important;
+            }
+            .hero-banner-gradient {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-purple-200 selection:text-purple-900">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none no-print"></div>
+
+    <!-- Edit Mode Top Indicator Banner -->
+    <div id="edit-status-bar" class="hidden bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium shadow-md no-print sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 mx-auto sm:mx-0">
+                <span class="inline-flex h-2 w-2 rounded-full bg-amber-300 animate-ping"></span>
+                <span><strong>โหมดแก้ไขเปิดใช้งานอยู่:</strong> คลิกที่ข้อความ ตัวเลข หรือรูปโปรไฟล์เพื่อแก้ไขได้ทันที</span>
+            </div>
+            <div class="flex items-center gap-2 mx-auto sm:mx-0">
+                <button onclick="resetPortfolioData()" class="px-2.5 py-1 bg-white/15 hover:bg-white/25 rounded-lg text-xs transition flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-left"></i> รีเซ็ตค่าเริ่มต้น
+                </button>
+                <button onclick="toggleEditMode()" class="px-3 py-1 bg-white text-violet-700 hover:bg-violet-50 font-semibold rounded-lg text-xs transition shadow-sm flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i> เสร็จสิ้น &amp; บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. TOP NAVBAR -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 no-print" id="main-navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
+            <!-- Brand Logo -->
+            <a href="#" onclick="switchTab('profile'); return false;" class="flex items-center gap-2 text-slate-900 font-bold text-lg sm:text-xl tracking-tight shrink-0">
+                <span>Student Portfolio</span>
+            </a>
+
+            <!-- Desktop Navigation Menu -->
+            <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+                <button onclick="switchTab('works')" class="nav-link hover:text-violet-600 transition py-1" data-nav="works">ผลงานเด่น</button>
+                <button onclick="switchTab('certificates')" class="nav-link hover:text-violet-600 transition py-1" data-nav="certificates">เกียรติบัตร</button>
+                <button onclick="switchTab('activities')" class="nav-link hover:text-violet-600 transition py-1" data-nav="activities">กิจกรรมจิตอาสา</button>
+                <button onclick="switchTab('profile')" class="nav-link hover:text-violet-600 transition py-1 text-slate-900 font-semibold" data-nav="profile">ประวัติส่วนตัว</button>
+            </nav>
+
+            <!-- Right Action Buttons -->
+            <div class="flex items-center gap-2 sm:gap-2.5">
+                <!-- Reset Button -->
+                <button onclick="resetPortfolioData()" title="รีเซ็ตข้อมูลกลับเป็นค่าเริ่มต้น" class="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition text-xs sm:text-sm hidden lg:inline-flex items-center gap-1.5 border border-slate-200">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>รีเซ็ต</span>
+                </button>
+
+                <!-- Print PDF Button -->
+                <button onclick="window.print()" title="พิมพ์ หรือ บันทึกเป็น PDF" class="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition text-xs sm:text-sm hidden sm:inline-flex items-center gap-1.5 border border-slate-200">
+                    <i class="fa-solid fa-print"></i>
+                    <span class="hidden lg:inline">พิมพ์ PDF</span>
+                </button>
+
+                <!-- Edit / Save Toggle Button -->
+                <button id="btn-toggle-edit" onclick="toggleEditMode()" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium border bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square" id="edit-btn-icon"></i>
+                    <span id="edit-btn-text">แก้ไขข้อมูล</span>
+                </button>
+
+                <!-- Contact Web Developer Button -->
+                <button onclick="openContactModal()" class="px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium bg-[#7c3aed] hover:bg-[#6d28d9] text-white transition shadow-sm shadow-purple-200 flex items-center gap-1.5 shrink-0">
+                    <span>ติดต่อผู้พัฒนาเว็บ</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
+        <!-- 2. PROFILE HERO CARD -->
+        <section class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+            <!-- Pastel Top Gradient Banner -->
+            <div class="hero-banner-gradient h-36 sm:h-44 w-full relative">
+                <div class="absolute inset-0 bg-white/10 backdrop-blur-[1px]"></div>
+            </div>
+
+            <!-- Hero Profile Content -->
+            <div class="px-5 sm:px-10 pb-8 pt-0 relative">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                    
+                    <!-- Left: Avatar + Name + Bio + Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-7 -mt-16 sm:-mt-20 text-center sm:text-left">
+                        <!-- Profile Photo Frame -->
+                        <div class="relative group shrink-0">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-amber-50 p-1.5 shadow-md border border-white overflow-hidden">
+                                <img id="profile-avatar" src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80" onerror="this.src='https://placehold.co/300x300/ede9fe/6d28d9?text=Araya+S.'" alt="ด.ญ. อารยา สุภาษี" class="w-full h-full object-cover rounded-xl">
+                            </div>
+                            <!-- Upload Photo Overlay (Active in Edit Mode) -->
+                            <label id="avatar-upload-overlay" for="avatar-input" class="hidden absolute inset-1.5 rounded-xl bg-slate-900/65 text-white flex-col items-center justify-center cursor-pointer opacity-95 hover:opacity-100 transition">
+                                <i class="fa-solid fa-camera text-xl mb-1"></i>
+                                <span class="text-[11px] font-medium">เปลี่ยนรูปโปรไฟล์</span>
+                            </label>
+                            <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                        </div>
+
+                        <!-- Student Name & Description -->
+                        <div class="pt-1 sm:pt-20 flex-1">
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-2">
+                                <h1 id="hero-name" data-editable="true" data-field="heroName" class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight" contenteditable="false">ด.ญ. อารยา สุภาษี (ฟางข้าว)</h1>
+                                <span id="hero-badge" data-editable="true" data-field="heroBadge" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#7c3aed] text-white shadow-sm" contenteditable="false">สมัครเรียนต่อ ม.1 ⚡</span>
+                            </div>
+
+                            <p id="hero-subtitle" data-editable="true" data-field="heroSubtitle" class="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xl mb-5" contenteditable="false">จบการศึกษาชั้น ป.6 โรงเรียนอัสสัมชัญลำปาง • มีความมุ่งมั่นตั้งใจเข้าศึกษาต่อในแผนการเรียนวิทย์-คณิต (Gifted)</p>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 no-print">
+                                <button onclick="switchTab('profile')" class="px-5 py-2.5 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white text-xs sm:text-sm font-medium transition shadow-sm">
+                                    ประวัติและเหตุผลที่สมัคร
+                                </button>
+                                <button onclick="switchTab('certificates')" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition">
+                                    ดูเกียรติบัตรทั้งหมด
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: 3 Circular Badges + 3 Key Stats -->
+                    <div class="flex flex-col items-center lg:items-end justify-between gap-5 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                        <!-- 3 Circular Icons -->
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-full bg-[#f97316] text-white flex items-center justify-center shadow-sm text-sm" title="รางวัลดีเด่น">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div class="w-9 h-9 rounded-full bg-[#8b5cf6] text-white flex items-center justify-center shadow-sm text-sm" title="ความสามารถพิเศษ">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <div class="w-9 h-9 rounded-full bg-[#1e293b] text-white flex items-center justify-center shadow-sm text-sm" title="เกียรติบัตรวิชาการ">
+                                <i class="fa-solid fa-medal"></i>
+                            </div>
+                        </div>
+
+                        <!-- 3 Key Statistics -->
+                        <div class="flex items-center gap-6 sm:gap-8 text-center sm:text-left">
+                            <div>
+                                <div class="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5">เกรดเฉลี่ยสะสม (GPAX)</div>
+                                <div id="stat-gpax" data-editable="true" data-field="statGpax" class="text-xl sm:text-2xl font-bold text-slate-900" contenteditable="false">4.00</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5">เกียรติบัตร</div>
+                                <div id="stat-certs" data-editable="true" data-field="statCerts" class="text-xl sm:text-2xl font-bold text-slate-900" contenteditable="false">18</div>
+                            </div>
+                            <div>
+                                <div class="text-[11px] sm:text-xs text-slate-400 font-medium mb-0.5">กิจกรรม</div>
+                                <div id="stat-acts" data-editable="true" data-field="statActs" class="text-xl sm:text-2xl font-bold text-slate-900" contenteditable="false">12</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SINGLE UNIFIED TABS NAVIGATION -->
+        <section class="mb-6">
+            <div class="border-b border-slate-200 flex items-center gap-6 sm:gap-8 overflow-x-auto no-scrollbar">
+                <!-- Tab 1: ผลงานเด่น -->
+                <button onclick="switchTab('works')" id="tab-btn-works" class="tab-btn pb-3.5 text-xs sm:text-sm hover:text-slate-800 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 font-medium text-slate-500 border-transparent">
+                    <span>ผลงานเด่น</span>
+                    <span id="badge-count-works" class="text-[11px] text-slate-400 font-normal">(6)</span>
+                </button>
+
+                <!-- Tab 2: เกียรติบัตรวิชาการ -->
+                <button onclick="switchTab('certificates')" id="tab-btn-certificates" class="tab-btn pb-3.5 text-xs sm:text-sm hover:text-slate-800 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 font-medium text-slate-500 border-transparent">
+                    <span>เกียรติบัตรวิชาการ</span>
+                    <span id="badge-count-certificates" class="text-[11px] text-slate-400 font-normal">(18)</span>
+                </button>
+
+                <!-- Tab 3: กิจกรรมและจิตอาสา -->
+                <button onclick="switchTab('activities')" id="tab-btn-activities" class="tab-btn pb-3.5 text-xs sm:text-sm hover:text-slate-800 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 font-medium text-slate-500 border-transparent">
+                    <span>กิจกรรมและจิตอาสา</span>
+                    <span id="badge-count-activities" class="text-[11px] text-slate-400 font-normal">(12)</span>
+                </button>
+
+                <!-- Tab 4: ประวัติส่วนตัว & ความสามารถพิเศษ (Default Active) -->
+                <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn pb-3.5 text-xs sm:text-sm border-b-2 transition whitespace-nowrap flex items-center gap-1.5 font-semibold text-slate-900 border-slate-900">
+                    <span>ประวัติส่วนตัว &amp; ความสามารถพิเศษ</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. SINGLE TAB CONTENT AREA (NO DUPLICATES) -->
+        
+        <!-- TAB 4 CONTENT: ประวัติส่วนตัว & ความสามารถพิเศษ (Default View) -->
+        <div id="tab-content-profile" class="tab-panel bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+                
+                <!-- Left Card: ข้อมูลส่วนตัวนักเรียน -->
+                <div class="bg-[#f8fafc] rounded-2xl p-5 sm:p-7 border border-slate-200/70 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-5">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-6 h-6 rounded-md bg-violet-100 text-violet-600 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </span>
+                                <h2 class="text-base sm:text-lg font-bold text-slate-900">ข้อมูลส่วนตัวนักเรียน</h2>
+                            </div>
+                            <!-- Add Field Button (Visible in Edit Mode) -->
+                            <button onclick="addProfileRow()" class="edit-only-control hidden px-2.5 py-1 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-medium transition flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> เพิ่มหัวข้อข้อมูล
+                            </button>
+                        </div>
+
+                        <!-- Key-Value List -->
+                        <div id="personal-info-list" class="divide-y divide-slate-200/70 text-xs sm:text-sm"></div>
+                    </div>
+                </div>
+
+                <!-- Right Card: เหตุผลและเป้าหมายในการเข้าศึกษาต่อ -->
+                <div class="bg-[#f8fafc] rounded-2xl p-5 sm:p-7 border border-slate-200/70 flex flex-col">
+                    <div class="flex items-center gap-2.5 mb-5">
+                        <span class="w-6 h-6 rounded-md bg-pink-100 text-pink-500 flex items-center justify-center text-xs">
+                            <i class="fa-solid fa-heart"></i>
+                        </span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">เหตุผลและเป้าหมายในการเข้าศึกษาต่อ</h2>
+                    </div>
+
+                    <div class="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                        <p id="statement-p1" data-editable="true" data-field="statementP1" class="p-1" contenteditable="false">"หนูมีความตั้งใจอย่างยิ่งที่จะเข้ามาศึกษาต่อในระดับชั้นมัธยมศึกษาปีที่ 1 ณ โรงเรียนแห่งนี้ เนื่องจากเป็นสถานศึกษาที่มีชื่อเสียงด้านความเป็นเลิศทางวิชาการและส่งเสริมศักยภาพของผู้เรียนอย่างรอบด้าน"</p>
+                        <p id="statement-p2" data-editable="true" data-field="statementP2" class="p-1" contenteditable="false">"หากได้รับโอกาสเข้าศึกษา หนูพร้อมที่จะตั้งใจศึกษาเล่าเรียน ปฏิบัติตามกฎระเบียบของโรงเรียนอย่างเคร่งครัด และนำความรู้ความสามารถมาสร้างชื่อเสียงให้กับโรงเรียนต่อไปค่ะ"</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 1 CONTENT: ผลงานเด่น -->
+        <div id="tab-content-works" class="tab-panel hidden bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">ผลงานเด่นและโครงงานวิชาการ</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">รวบรวมผลงานภาคภูมิใจระหว่างศึกษาในระดับชั้นประถมศึกษา</p>
+                </div>
+                <button onclick="openAddItemModal('works')" class="edit-only-control hidden px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> เพิ่มผลงานใหม่
+                </button>
+            </div>
+            <div id="works-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </div>
+
+        <!-- TAB 2 CONTENT: เกียรติบัตรวิชาการ -->
+        <div id="tab-content-certificates" class="tab-panel hidden bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">เกียรติบัตรและรางวัลทางวิชาการ</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">เอกสารรับรองผลการแข่งขันและการเข้าร่วมอบรมทางวิชาการ</p>
+                </div>
+                <button onclick="openAddItemModal('certificates')" class="edit-only-control hidden px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> เพิ่มเกียรติบัตร
+                </button>
+            </div>
+            <div id="certificates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </div>
+
+        <!-- TAB 3 CONTENT: กิจกรรมและจิตอาสา -->
+        <div id="tab-content-activities" class="tab-panel hidden bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">กิจกรรมพัฒนาผู้เรียนและจิตอาสา</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">การมีส่วนร่วมในกิจกรรมของโรงเรียนและบำเพ็ญประโยชน์ต่อสังคม</p>
+                </div>
+                <button onclick="openAddItemModal('activities')" class="edit-only-control hidden px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> เพิ่มกิจกรรม
+                </button>
+            </div>
+            <div id="activities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </div>
+
+    </main>
+
+    <!-- 5. FOOTER -->
+    <footer class="bg-white border-t border-slate-200/80 mt-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <!-- Left Copyright Text -->
+            <div id="footer-copyright" data-editable="true" data-field="footerCopyright" class="text-center sm:text-left" contenteditable="false">© 2026 Student E-Portfolio สำหรับยื่นประกอบการสอบสัมภาษณ์เข้าศึกษาต่อระดับชั้น ม.1</div>
+
+            <!-- Right Developer Badge & Green Line ID Button -->
+            <div class="flex flex-wrap items-center justify-center gap-2.5 bg-slate-50 border border-slate-200/90 rounded-2xl px-3.5 py-2">
+                <div class="flex items-center gap-1.5 text-slate-600">
+                    <span class="text-violet-600 font-bold">&lt;/&gt;</span>
+                    <span>พัฒนาเว็บไซต์โดย:</span>
+                    <strong id="dev-name" data-editable="true" data-field="devName" class="text-slate-900 font-semibold" contenteditable="false">คุณอารยา สุภาษี</strong>
+                </div>
+                <button onclick="copyLineId()" class="px-3 py-1.5 rounded-lg bg-[#06c755] hover:bg-[#05b34c] active:scale-95 text-white font-medium transition flex items-center gap-1.5 cursor-pointer" title="คลิกเพื่อคัดลอก Line ID">
+                    <i class="fa-brands fa-line text-sm"></i>
+                    <span>Line ID: <span id="dev-line" data-editable="true" data-field="devLine" contenteditable="false">araya.fangkaw</span></span>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: CONTACT DEVELOPER MODAL -->
+    <div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">ติดต่อผู้พัฒนาเว็บไซต์</h3>
+                        <p class="text-xs text-slate-500">สอบถามข้อมูลหรือสั่งทำ E-Portfolio</p>
+                    </div>
+                </div>
+                <button onclick="closeContactModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/70 space-y-3 mb-5 text-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500">ผู้พัฒนาเว็บไซต์:</span>
+                    <span class="font-semibold text-slate-900">คุณอารยา สุภาษี</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500">ช่องทางติดต่อ Line:</span>
+                    <span class="font-semibold text-[#06c755]">araya.fangkaw</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <button onclick="copyLineId(); closeContactModal();" class="flex-1 py-2.5 px-4 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-line text-base"></i> คัดลอก Line ID
+                </button>
+                <button onclick="closeContactModal()" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm transition">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD PORTFOLIO ITEM MODAL -->
+    <div id="add-item-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="add-modal-title" class="text-lg font-bold text-slate-900">เพิ่มรายการใหม่</h3>
+                <button onclick="closeAddItemModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="add-item-form" onsubmit="submitNewItem(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="item-category-input">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อรายการ / รางวัล / กิจกรรม *</label>
+                    <input type="text" id="item-title-input" required placeholder="เช่น รางวัลเหรียญทองการแข่งขันคณิตศาสตร์" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">ปีการศึกษา / วันที่</label>
+                        <input type="text" id="item-date-input" placeholder="เช่น ปีการศึกษา 2568" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">ระดับ / ประเภท</label>
+                        <input type="text" id="item-tag-input" placeholder="เช่น ระดับเขตพื้นที่" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">รายละเอียดเพิ่มเติม</label>
+                    <textarea id="item-desc-input" rows="3" placeholder="บรรยายรายละเอียดของผลงานหรือสิ่งที่ได้รับ..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-500"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">ยกเลิก</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium">เพิ่มรายการ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // Clean Default Portfolio Data for ด.ญ. อารยา สุภาษี (ฟางข้าว)
+        const DEFAULT_PORTFOLIO_DATA = {
+            heroName: "ด.ญ. อารยา สุภาษี (ฟางข้าว)",
+            heroBadge: "สมัครเรียนต่อ ม.1 ⚡",
+            heroSubtitle: "จบการศึกษาชั้น ป.6 โรงเรียนอัสสัมชัญลำปาง • มีความมุ่งมั่นตั้งใจเข้าศึกษาต่อในแผนการเรียนวิทย์-คณิต (Gifted)",
+            avatarUrl: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80",
+            statGpax: "4.00",
+            statCerts: "18",
+            statActs: "12",
+            statementP1: `"หนูมีความตั้งใจอย่างยิ่งที่จะเข้ามาศึกษาต่อในระดับชั้นมัธยมศึกษาปีที่ 1 ณ โรงเรียนแห่งนี้ เนื่องจากเป็นสถานศึกษาที่มีชื่อเสียงด้านความเป็นเลิศทางวิชาการและส่งเสริมศักยภาพของผู้เรียนอย่างรอบด้าน"`,
+            statementP2: `"หากได้รับโอกาสเข้าศึกษา หนูพร้อมที่จะตั้งใจศึกษาเล่าเรียน ปฏิบัติตามกฎระเบียบของโรงเรียนอย่างเคร่งครัด และนำความรู้ความสามารถมาสร้างชื่อเสียงให้กับโรงเรียนต่อไปค่ะ"`,
+            footerCopyright: "© 2026 Student E-Portfolio สำหรับยื่นประกอบการสอบสัมภาษณ์เข้าศึกษาต่อระดับชั้น ม.1",
+            devName: "คุณอารยา สุภาษี",
+            devLine: "araya.fangkaw",
+            personalInfo: [
+                { label: "ชื่อ - นามสกุล", value: "เด็กหญิงอารยา สุภาษี" },
+                { label: "ชื่อเล่น", value: "ฟางข้าว" },
+                { label: "วัน/เดือน/ปีเกิด", value: "28 สิงหาคม 2557 (อายุ 12 ปี)" },
+                { label: "โรงเรียนเดิม", value: "โรงเรียนอัสสัมชัญลำปาง" },
+                { label: "เกรดเฉลี่ยสะสม (ป.4 - ป.6)", value: "4.00" },
+                { label: "วิชาที่ถนัด", value: "คณิตศาสตร์, วิทยาศาสตร์" },
+                { label: "ความสามารถพิเศษ", value: "กีฬา, เปียโน" },
+                { label: "งานอดิเรก", value: "ดูทีวี" }
+            ],
+            works: [
+                {
+                    title: "โครงงานวิทยาศาสตร์: เครื่องกรองน้ำอัจฉริยะจากวัสดุธรรมชาติ",
+                    date: "ปีการศึกษา 2568",
+                    tag: "รางวัลชนะเลิศเหรียญทอง",
+                    desc: "ออกแบบและทดลองระบบกรองน้ำขนาดเล็กเพื่อลดความขุ่นและปรับค่า pH ของน้ำในชุมชน นำเสนอในงานสัปดาห์วิทยาศาสตร์"
+                },
+                {
+                    title: "การพัฒนาเกมเพื่อการเรียนรู้ด้วย Scratch",
+                    date: "ปีการศึกษา 2568",
+                    tag: "รางวัลรองชนะเลิศอันดับ 1",
+                    desc: "สร้างเกมฝึกทักษะการคิดคำนวณทางคณิตศาสตร์สำหรับนักเรียนชั้นประถมศึกษา สามารถเล่นโต้ตอบและเก็บคะแนนได้จริง"
+                },
+                {
+                    title: "ตัวแทนแข่งขันทักษะทางวิทยาศาสตร์และคณิตศาสตร์",
+                    date: "ปีการศึกษา 2567",
+                    tag: "ระดับเขตพื้นที่การศึกษา",
+                    desc: "ได้รับรางวัลเหรียญทองในการแข่งขันทักษะทางวิชาการ งานศิลปหัตถกรรมนักเรียน"
+                },
+                {
+                    title: "การประกวดโครงงานคณิตศาสตร์ประเภทบูรณาการความรู้",
+                    date: "ปีการศึกษา 2567",
+                    tag: "รางวัลเหรียญทอง",
+                    desc: "ประยุกต์ใช้หลักการเรขาคณิตและสถิติในการออกแบบบรรจุภัณฑ์ลดขยะพลาสติกภายในโรงเรียน"
+                },
+                {
+                    title: "การแสดงเดี่ยวเปียโนในงานวันคริสต์มาสและวันวิชาการโรงเรียน",
+                    date: "ปีการศึกษา 2568",
+                    tag: "ความสามารถพิเศษด้านดนตรี",
+                    desc: "ร่วมบรรเลงเปียโนในพิธีเปิดงานประจำปีของโรงเรียนอัสสัมชัญลำปาง"
+                },
+                {
+                    title: "นักกีฬาตัวแทนสีในการแข่งขันกรีฑาและกีฬาภายใน",
+                    date: "ปีการศึกษา 2568",
+                    tag: "ความสามารถพิเศษด้านกีฬา",
+                    desc: "ได้รับรางวัลเหรียญเงินในการแข่งขันกีฬาประเภทรวมทีม ระดับชั้นประถมศึกษาตอนปลาย"
+                }
+            ],
+            certificates: [
+                {
+                    title: "เกียรติบัตรเหรียญทอง การแข่งขันอัจฉริยภาพทางคณิตศาสตร์",
+                    date: "กุมภาพันธ์ 2569",
+                    tag: "ระดับเขตพื้นที่การศึกษา",
+                    desc: "สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน (สพฐ.)"
+                },
+                {
+                    title: "เกียรติบัตรรางวัลชนะเลิศ การแข่งขันทักษะทางวิทยาศาสตร์",
+                    date: "ธันวาคม 2568",
+                    tag: "ระดับจังหวัด",
+                    desc: "ผ่านเกณฑ์การประเมินระดับดีเยี่ยม"
+                },
+                {
+                    title: "เกียรติบัตรผู้มีผลการเรียนดีเด่น เกรดเฉลี่ย 4.00",
+                    date: "ปีการศึกษา 2568",
+                    tag: "โรงเรียนอัสสัมชัญลำปาง",
+                    desc: "มอบให้แก่นักเรียนที่มีความวิริยะอุตสาหะและมีผลการเรียนยอดเยี่ยมตลอดปีการศึกษา"
+                }
+            ],
+            activities: [
+                {
+                    title: "คณะกรรมการสภานักเรียน ฝ่ายวิชาการและกีฬา",
+                    date: "ปีการศึกษา 2568",
+                    tag: "ภาวะผู้นำ",
+                    desc: "ร่วมจัดกิจกรรมส่งเสริมการเรียนรู้และกิจกรรมกีฬาสีภายในโรงเรียนอัสสัมชัญลำปาง"
+                },
+                {
+                    title: "จิตอาสาโครงการ 'พี่สอนน้องรักการอ่านและคณิตคิดสนุก'",
+                    date: "ภาคเรียนที่ 2 / 2568",
+                    tag: "จิตอาสา",
+                    desc: "ใช้เวลาว่างช่วงพักกลางวันช่วยสอนการบ้านและทบทวนบทเรียนให้น้องๆ ชั้นประถมศึกษาตอนต้น"
+                },
+                {
+                    title: "ค่ายเยาวชนรักษ์สิ่งแวดล้อมและปลูกป่าชุมชน",
+                    date: "ตุลาคม 2568",
+                    tag: "บำเพ็ญประโยชน์",
+                    desc: "เข้าร่วมกิจกรรมปลูกต้นไม้และคัดแยกขยะรีไซเคิลร่วมกับชุมชน"
+                }
+            ]
+        };
+
+        // Use a fresh storage key to prevent any legacy duplicate state
+        const STORAGE_KEY = "student_eportfolio_araya_clean_v4";
+        let portfolioData = {};
+        let isEditMode = false;
+        let currentTab = "profile";
+
+        // Initialize App on Load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadPortfolioData();
+            renderAll();
+            switchTab("profile");
+            setupInlineEditing();
+        });
+
+        // Load from LocalStorage or Fallback to Default
+        function loadPortfolioData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    portfolioData = JSON.parse(saved);
+                } else {
+                    portfolioData = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO_DATA));
+                }
+            } catch (e) {
+                console.error("Failed to load data:", e);
+                portfolioData = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO_DATA));
+            }
+        }
+
+        // Save to LocalStorage
+        function savePortfolioData(showNotice = false) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolioData));
+                if (showNotice) {
+                    showToast("บันทึกข้อมูลเรียบร้อยแล้ว", "success");
+                }
+            } catch (e) {
+                showToast("ไม่สามารถบันทึกข้อมูลได้ (พื้นที่จัดเก็บเต็ม)", "error");
+            }
+        }
+
+        // Render entire UI from portfolioData state
+        function renderAll() {
+            const fieldMap = {
+                "hero-name": "heroName",
+                "hero-badge": "heroBadge",
+                "hero-subtitle": "heroSubtitle",
+                "stat-gpax": "statGpax",
+                "stat-certs": "statCerts",
+                "stat-acts": "statActs",
+                "statement-p1": "statementP1",
+                "statement-p2": "statementP2",
+                "footer-copyright": "footerCopyright",
+                "dev-name": "devName",
+                "dev-line": "devLine"
+            };
+
+            for (const [elId, key] of Object.entries(fieldMap)) {
+                const el = document.getElementById(elId);
+                if (el && portfolioData[key] !== undefined) {
+                    el.innerText = portfolioData[key];
+                }
+            }
+
+            // Avatar
+            const avatarEl = document.getElementById("profile-avatar");
+            if (avatarEl && portfolioData.avatarUrl) {
+                avatarEl.src = portfolioData.avatarUrl;
+            }
+
+            // Personal Info Key-Value List
+            renderPersonalInfo();
+
+            // Cards for Works, Certificates, Activities
+            renderCategoryGrid("works", "works-grid", "fa-lightbulb", "violet");
+            renderCategoryGrid("certificates", "certificates-grid", "fa-award", "amber");
+            renderCategoryGrid("activities", "activities-grid", "fa-hand-holding-heart", "emerald");
+
+            // Update Tab Counters
+            document.getElementById("badge-count-works").innerText = `(${portfolioData.works.length})`;
+            document.getElementById("badge-count-certificates").innerText = `(${portfolioData.statCerts || portfolioData.certificates.length})`;
+            document.getElementById("badge-count-activities").innerText = `(${portfolioData.statActs || portfolioData.activities.length})`;
+
+            applyEditModeAttributes();
+        }
+
+        // Render Left Card Personal Info Key-Value Rows
+        function renderPersonalInfo() {
+            const container = document.getElementById("personal-info-list");
+            container.innerHTML = "";
+
+            portfolioData.personalInfo.forEach((row, index) => {
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "py-3 flex items-center justify-between gap-4 group";
+
+                rowDiv.innerHTML = `
+                    <span data-editable="true" 
+                          onblur="updatePersonalRow(${index}, 'label', this.innerText)"
+                          class="text-slate-500 font-normal shrink-0">${escapeHtml(row.label)}</span>
+                    <div class="flex items-center gap-2 text-right">
+                        <span data-editable="true" 
+                              onblur="updatePersonalRow(${index}, 'value', this.innerText)"
+                              class="text-slate-900 font-semibold">${escapeHtml(row.value)}</span>
+                        <button onclick="deletePersonalRow(${index})" 
+                                title="ลบหัวข้อนี้"
+                                class="edit-only-control ${isEditMode ? '' : 'hidden'} text-rose-400 hover:text-rose-600 p-1 rounded transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(rowDiv);
+            });
+        }
+
+        // Render Cards for Works, Certificates, Activities
+        function renderCategoryGrid(category, containerId, iconClass, colorTheme) {
+            const container = document.getElementById(containerId);
+            const items = portfolioData[category] || [];
+            container.innerHTML = "";
+
+            const colorStyles = {
+                violet: "bg-violet-100 text-violet-600",
+                amber: "bg-amber-100 text-amber-600",
+                emerald: "bg-emerald-100 text-emerald-600"
+            };
+
+            items.forEach((item, index) => {
+                const card = document.createElement("div");
+                card.className = "bg-[#f8fafc] rounded-2xl p-5 border border-slate-200/70 hover:border-violet-200 transition flex flex-col justify-between relative group";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <span class="w-9 h-9 rounded-xl ${colorStyles[colorTheme]} flex items-center justify-center text-sm shrink-0">
+                                <i class="fa-solid ${iconClass}"></i>
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <span data-editable="true"
+                                      onblur="updateCategoryItem('${category}', ${index}, 'tag', this.innerText)"
+                                      class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] font-medium text-slate-600">
+                                    ${escapeHtml(item.tag)}
+                                </span>
+                                <button onclick="deleteCategoryItem('${category}', ${index})" 
+                                        title="ลบรายการนี้"
+                                        class="edit-only-control ${isEditMode ? '' : 'hidden'} w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-500 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 data-editable="true"
+                            onblur="updateCategoryItem('${category}', ${index}, 'title', this.innerText)"
+                            class="font-bold text-slate-900 text-sm sm:text-base mb-2 leading-snug">
+                            ${escapeHtml(item.title)}
+                        </h3>
+                        <p data-editable="true"
+                           onblur="updateCategoryItem('${category}', ${index}, 'desc', this.innerText)"
+                           class="text-xs text-slate-500 leading-relaxed mb-4">
+                            ${escapeHtml(item.desc)}
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
+                        <span data-editable="true"
+                              onblur="updateCategoryItem('${category}', ${index}, 'date', this.innerText)">
+                            <i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(item.date)}
+                        </span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Setup Inline Editing Listeners for Static Fields
+        function setupInlineEditing() {
+            document.querySelectorAll('[data-field]').forEach(el => {
+                el.addEventListener('blur', function() {
+                    const field = this.getAttribute('data-field');
+                    portfolioData[field] = this.innerText.trim();
+                    
+                    if (field === "statCerts") {
+                        document.getElementById("badge-count-certificates").innerText = `(${portfolioData[field]})`;
+                    }
+                    if (field === "statActs") {
+                        document.getElementById("badge-count-activities").innerText = `(${portfolioData[field]})`;
+                    }
+                    savePortfolioData(false);
+                });
+            });
+        }
+
+        // Toggle Edit Mode ON / OFF
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const body = document.body;
+            const btnText = document.getElementById("edit-btn-text");
+            const btnIcon = document.getElementById("edit-btn-icon");
+            const editBtn = document.getElementById("btn-toggle-edit");
+            const statusBar = document.getElementById("edit-status-bar");
+            const avatarOverlay = document.getElementById("avatar-upload-overlay");
+
+            if (isEditMode) {
+                body.classList.add("edit-mode-active");
+                btnText.innerText = "บันทึกข้อมูล";
+                btnIcon.className = "fa-solid fa-floppy-disk";
+                editBtn.classList.remove("bg-violet-50", "text-violet-700", "border-violet-200");
+                editBtn.classList.add("bg-emerald-600", "text-white", "border-emerald-600", "hover:bg-emerald-700");
+                statusBar.classList.remove("hidden");
+                avatarOverlay.classList.remove("hidden");
+                avatarOverlay.classList.add("flex");
+                showToast("เปิดโหมดแก้ไขแล้ว คลิกที่ข้อความเพื่อแก้ไขได้ทันที", "info");
+            } else {
+                body.classList.remove("edit-mode-active");
+                btnText.innerText = "แก้ไขข้อมูล";
+                btnIcon.className = "fa-solid fa-pen-to-square";
+                editBtn.classList.add("bg-violet-50", "text-violet-700", "border-violet-200");
+                editBtn.classList.remove("bg-emerald-600", "text-white", "border-emerald-600", "hover:bg-emerald-700");
+                statusBar.classList.add("hidden");
+                avatarOverlay.classList.add("hidden");
+                avatarOverlay.classList.remove("flex");
+                savePortfolioData(true);
+            }
+
+            applyEditModeAttributes();
+        }
+
+        // Apply contentEditable attribute to all [data-editable="true"] elements
+        function applyEditModeAttributes() {
+            document.querySelectorAll('[data-editable="true"]').forEach(el => {
+                el.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
+            });
+            document.querySelectorAll('.edit-only-control').forEach(el => {
+                if (isEditMode) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        // Update Personal Info Row
+        function updatePersonalRow(index, key, value) {
+            if (portfolioData.personalInfo[index]) {
+                portfolioData.personalInfo[index][key] = value.trim();
+                savePortfolioData(false);
+            }
+        }
+
+        // Add New Personal Info Row
+        function addProfileRow() {
+            portfolioData.personalInfo.push({
+                label: "หัวข้อใหม่ (คลิกแก้)",
+                value: "ระบุรายละเอียด"
+            });
+            savePortfolioData(false);
+            renderPersonalInfo();
+            applyEditModeAttributes();
+            showToast("เพิ่มหัวข้อข้อมูลส่วนตัวแล้ว", "success");
+        }
+
+        // Delete Personal Info Row
+        function deletePersonalRow(index) {
+            portfolioData.personalInfo.splice(index, 1);
+            savePortfolioData(false);
+            renderPersonalInfo();
+            applyEditModeAttributes();
+            showToast("ลบหัวข้อข้อมูลแล้ว", "info");
+        }
+
+        // Update Category Item
+        function updateCategoryItem(category, index, key, value) {
+            if (portfolioData[category] && portfolioData[category][index]) {
+                portfolioData[category][index][key] = value.trim();
+                savePortfolioData(false);
+            }
+        }
+
+        // Delete Category Item
+        function deleteCategoryItem(category, index) {
+            portfolioData[category].splice(index, 1);
+            savePortfolioData(false);
+            renderAll();
+            showToast("ลบรายการเรียบร้อยแล้ว", "info");
+        }
+
+        // Handle Profile Photo Upload
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                portfolioData.avatarUrl = e.target.result;
+                document.getElementById("profile-avatar").src = e.target.result;
+                savePortfolioData(true);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Switch Tabs cleanly
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            const activePanel = document.getElementById(`tab-content-${tabName}`);
+            if (activePanel) activePanel.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('font-semibold', 'text-slate-900', 'border-slate-900');
+                btn.classList.add('font-medium', 'text-slate-500', 'border-transparent');
+            });
+
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('font-medium', 'text-slate-500', 'border-transparent');
+                activeBtn.classList.add('font-semibold', 'text-slate-900', 'border-slate-900');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-nav') === tabName) {
+                    link.classList.add('text-slate-900', 'font-semibold');
+                } else {
+                    link.classList.remove('text-slate-900', 'font-semibold');
+                }
+            });
+        }
+
+        // Add Item Modal Controls
+        function openAddItemModal(category) {
+            const titles = {
+                works: "เพิ่มผลงานเด่นใหม่",
+                certificates: "เพิ่มเกียรติบัตรใหม่",
+                activities: "เพิ่มกิจกรรมและจิตอาสา"
+            };
+            document.getElementById("add-modal-title").innerText = titles[category] || "เพิ่มรายการใหม่";
+            document.getElementById("item-category-input").value = category;
+            document.getElementById("add-item-form").reset();
+            const modal = document.getElementById("add-item-modal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeAddItemModal() {
+            const modal = document.getElementById("add-item-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        function submitNewItem(event) {
+            event.preventDefault();
+            const category = document.getElementById("item-category-input").value;
+            const title = document.getElementById("item-title-input").value.trim();
+            const date = document.getElementById("item-date-input").value.trim() || "ปีการศึกษา 2568";
+            const tag = document.getElementById("item-tag-input").value.trim() || "ผลงานดีเด่น";
+            const desc = document.getElementById("item-desc-input").value.trim() || "รายละเอียดผลงานและรางวัลที่ได้รับ";
+
+            portfolioData[category].unshift({ title, date, tag, desc });
+            savePortfolioData(true);
+            renderAll();
+            closeAddItemModal();
+        }
+
+        // Contact Developer Modal Controls
+        function openContactModal() {
+            const modal = document.getElementById("contact-modal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById("contact-modal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        // Copy Line ID
+        function copyLineId() {
+            const lineId = portfolioData.devLine || "araya.fangkaw";
+            const tempInput = document.createElement("textarea");
+            tempInput.value = lineId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand("copy");
+                showToast(`คัดลอก Line ID: ${lineId} เรียบร้อยแล้ว`, "success");
+            } catch (err) {
+                showToast(`Line ID: ${lineId}`, "info");
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // Reset Portfolio Data to Default
+        function resetPortfolioData() {
+            portfolioData = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO_DATA));
+            savePortfolioData(false);
+            renderAll();
+            showToast("รีเซ็ตข้อมูลกลับเป็นค่าเริ่มต้นเรียบร้อยแล้ว", "info");
+        }
+
+        // Custom Toast Notification
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            
+            const styles = {
+                success: "bg-slate-900 text-white border-slate-700",
+                info: "bg-violet-600 text-white border-violet-500",
+                error: "bg-rose-600 text-white border-rose-500"
+            };
+            const icons = {
+                success: "fa-circle-check text-emerald-400",
+                info: "fa-circle-info text-violet-200",
+                error: "fa-circle-exclamation text-rose-200"
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg border text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${styles[type]}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type]}"></i><span>${escapeHtml(message)}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove("translate-y-2", "opacity-0");
+            });
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-2");
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Escape HTML helper
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
